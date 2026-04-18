@@ -90,8 +90,10 @@ Right-click → Open with Live Server
 
 ## 👤 Author
 
-**Your Name**  
-[GitHub](https://github.com/your-username) • [LinkedIn](https://linkedin.com/in/your-profile)
+**Hamza Siddiqui**  
+[GitHub](https://github.com/hamza-datascientist?tab=repositories) • [LinkedIn](
+    https://www.linkedin.com/in/hamza-siddiqui-990b48330
+)
 
 ---
 
