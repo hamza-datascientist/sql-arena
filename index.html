@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Arena — Data Analyst Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #00e5a0;
+    --accent2: #7c6aff;
+    --warn: #ff6b35;
+    --text: #e8e8f0;
+    --muted: #6b6b88;
+    --green: #00e5a0;
+    --red: #ff4d6d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); }
+  .level-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    border-radius: 4px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 16px 24px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN LAYOUT */
+  .main { padding: 24px; max-width: 1000px; margin: 0 auto; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ROADMAP */
+  .roadmap-title {
+    font-size: 22px; font-weight: 800; margin-bottom: 6px;
+  }
+  .roadmap-sub {
+    font-size: 14px; color: var(--muted); margin-bottom: 24px;
+  }
+  .phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .phase::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .phase.p1::before { background: #00e5a0; }
+  .phase.p2::before { background: #7c6aff; }
+  .phase.p3::before { background: #ff6b35; }
+  .phase.p4::before { background: #f5c518; }
+  .phase-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  }
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+  .p1 .phase-num { background: #00e5a020; color: #00e5a0; }
+  .p2 .phase-num { background: #7c6aff20; color: #7c6aff; }
+  .p3 .phase-num { background: #ff6b3520; color: #ff6b35; }
+  .p4 .phase-num { background: #f5c51820; color: #f5c518; }
+  .phase-title { font-size: 16px; font-weight: 700; }
+  .phase-time { font-size: 12px; color: var(--muted); margin-left: auto; font-family: 'Space Mono', monospace; }
+  .topics {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .topic-tag {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: #ffffff08;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text);
+  }
+  .tip-box {
+    background: #00e5a010;
+    border: 1px solid #00e5a030;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #a0f0d0;
+    line-height: 1.6;
+  }
+  .tip-box strong { color: var(--accent); }
+
+  /* PRACTICE SECTION */
+  .practice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media(max-width: 600px) { .practice-grid { grid-template-columns: 1fr; } }
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .q-card:hover { border-color: var(--accent2); transform: translateY(-1px); }
+  .q-card.selected { border-color: var(--accent); background: #00e5a008; }
+  .q-level {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+  .easy { background: #00e5a020; color: #00e5a0; }
+  .medium { background: #f5c51820; color: #f5c518; }
+  .hard { background: #ff4d6d20; color: #ff4d6d; }
+  .q-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .q-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* EDITOR */
+  .editor-area {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #0d0d16;
+    border-bottom: 1px solid var(--border);
+  }
+  .editor-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+  }
+  .btn-primary:hover { background: #00ffb0; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+  }
+  .btn-secondary:hover { background: #7c6aff15; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  textarea {
+    width: 100%;
+    background: #0a0a12;
+    color: #c9d1d9;
+    border: none;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 140px;
+    outline: none;
+  }
+
+  /* RESULT */
+  .result-box {
+    margin-top: 16px;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    display: none;
+  }
+  .result-box.show { display: block; }
+  .result-box.loading {
+    background: #ffffff08;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .result-box.good {
+    background: #00e5a010;
+    border: 1px solid #00e5a030;
+    color: #a0f0d0;
+  }
+  .result-box.bad {
+    background: #ff4d6d10;
+    border: 1px solid #ff4d6d30;
+    color: #ffb3c0;
+  }
+  .result-box.neutral {
+    background: #7c6aff10;
+    border: 1px solid #7c6aff30;
+    color: #c4bcff;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--muted);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* INTERVIEW SECTION */
+  .interview-category {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    margin-top: 24px;
+  }
+  .iq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .iq-item:hover { border-color: var(--accent2); }
+  .iq-item.open { border-color: var(--accent2); }
+  .iq-question {
+    font-size: 14px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px;
+  }
+  .iq-arrow { color: var(--muted); font-size: 16px; flex-shrink: 0; transition: transform 0.2s; }
+  .iq-item.open .iq-arrow { transform: rotate(90deg); color: var(--accent2); }
+  .iq-answer {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: #c4bcff;
+    line-height: 1.7;
+  }
+  .iq-item.open .iq-answer { display: block; }
+  .iq-answer code {
+    display: block;
+    background: #0a0a12;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: #a9c5e8;
+    margin: 8px 0;
+    white-space: pre-wrap;
+    border: 1px solid var(--border);
+  }
+
+  /* ASSESSMENT */
+  .assess-intro {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .assess-score {
+    font-size: 52px; font-weight: 800;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .skill-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .skill-label { font-size: 13px; width: 160px; flex-shrink: 0; }
+  .skill-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .skill-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 1s ease;
+  }
+  .skill-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    width: 36px;
+    text-align: right;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SQL <span>Arena</span></div>
+  <div class="level-badge">DATA ANALYST TRACK</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('roadmap')">📍 Roadmap</div>
+  <div class="tab" onclick="showTab('practice')">⚡ Practice</div>
+  <div class="tab" onclick="showTab('interview')">🎯 Interview Prep</div>
+  <div class="tab" onclick="showTab('assess')">📊 My Level</div>
+</div>
+
+<!-- ===================== ROADMAP ===================== -->
+<div class="main">
+<div class="section active" id="roadmap">
+  <div class="roadmap-title">SQL Roadmap for Data Analysts</div>
+  <div class="roadmap-sub">Exactly kitna SQL aana chahiye — phase by phase</div>
+
+  <div class="phase p1">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 1</span>
+      <span class="phase-title">Foundation — Must Know</span>
+      <span class="phase-time">2–3 weeks</span>
+    </div>
+    <div class="topics">
+      <span class="topic-tag">SELECT, WHERE, ORDER BY</span>
+      <span class="topic-tag">Filtering with AND/OR/IN/BETWEEN</span>
+      <span class="topic-tag">GROUP BY + HAVING</span>
+      <span class="topic-tag">COUNT, SUM, AVG, MIN, MAX</span>
+      <span class="topic-tag">DISTINCT</span>
+      <span class="topic-tag">NULL handling (IS NULL, COALESCE)</span>
+      <span class="topic-tag">LIKE / wildcards</span>
+      <span class="topic-tag">LIMIT / TOP</span>
+    </div>
+  </div>
+
+  <div class="phase p2">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 2</span>
+      <span class="phase-title">Intermediate — Core Analyst Skills</span>
+      <span class="phase-time">3–4 weeks</span>
+    </div>
+    <div class="topics">
+      <span class="topic-tag">JOINS — INNER, LEFT, RIGHT, FULL</span>
+      <span class="topic-tag">Subqueries (nested SELECT)</span>
+      <span class="topic-tag">CTEs (WITH clause)</span>
+      <span class="topic-tag">CASE WHEN</span>
+      <span class="topic-tag">String functions (TRIM, UPPER, CONCAT)</span>
+      <span class="topic-tag">Date functions (DATEDIFF, DATEPART)</span>
+      <span class="topic-tag">UNION / UNION ALL</span>
+    </div>
+  </div>
+
+  <div class="phase p3">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 3</span>
+      <span class="phase-title">Advanced — Interview Level</span>
+      <span class="phase-time">3–5 weeks</span>
+    </div>
+    <div class="topics">
+      <span class="topic-tag">Window Functions — ROW_NUMBER, RANK</span>
+      <span class="topic-tag">DENSE_RANK, NTILE</span>
+      <span class="topic-tag">LAG / LEAD</span>
+      <span class="topic-tag">PARTITION BY</span>
+      <span class="topic-tag">Running totals / Moving averages</span>
+      <span class="topic-tag">Self Joins</span>
+      <span class="topic-tag">Performance basics (INDEX idea)</span>
+    </div>
+  </div>
+
+  <div class="phase p4">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 4</span>
+      <span class="phase-title">Real World Practice</span>
+      <span class="phase-time">Ongoing</span>
+    </div>
+    <div class="topics">
+      <span class="topic-tag">LeetCode SQL 50</span>
+      <span class="topic-tag">StrataScratch</span>
+      <span class="topic-tag">DataLemur</span>
+      <span class="topic-tag">Mode Analytics tutorials</span>
+      <span class="topic-tag">Build your own mini-projects</span>
+      <span class="topic-tag">Mock interviews</span>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>💡 Pro Tip:</strong> Data Analyst interviews mein <strong>Window Functions aur CTEs</strong> sabse zyada pooche jaate hain. Agar tum RANK(), DENSE_RANK(), LAG/LEAD confidently likh sako — tum 80% candidates se aage ho. Pehle logic samjho, syntax baad mein aata hai.
+  </div>
+</div>
+
+<!-- ===================== PRACTICE ===================== -->
+<div class="section" id="practice">
+  <div class="section-label">Pick a question to practice</div>
+  <div class="practice-grid" id="questionGrid"></div>
+
+  <div class="editor-area" id="editorArea" style="display:none">
+    <div class="editor-header">
+      <span class="editor-title">SQL EDITOR — <span id="activeQTitle">-</span></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" onclick="resetEditor()">Reset</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitQuery()">▶ Assess</button>
+      </div>
+    </div>
+    <textarea id="sqlEditor" placeholder="-- Write your SQL query here...
+-- Example: SELECT * FROM employees WHERE salary > 50000;"></textarea>
+    <div id="resultBox" class="result-box"></div>
+  </div>
+</div>
+
+<!-- ===================== INTERVIEW ===================== -->
+<div class="section" id="interview">
+  <div class="section-label">Common interview questions with answers</div>
+
+  <div class="interview-category">🔹 Conceptual Questions</div>
+  <div id="conceptualQ"></div>
+
+  <div class="interview-category">🔹 Write the Query Questions</div>
+  <div id="queryQ"></div>
+
+  <div class="interview-category">🔹 Scenario-based Questions</div>
+  <div id="scenarioQ"></div>
+</div>
+
+<!-- ===================== ASSESS ===================== -->
+<div class="section" id="assess">
+  <div class="assess-intro">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Describe your SQL experience and get AI feedback</div>
+    <textarea id="selfAssess" style="min-height:90px;border-radius:8px;margin-top:8px;font-family:'Syne',sans-serif;font-size:13px;" placeholder="Example: I know SELECT, WHERE, GROUP BY. I've practiced JOINs a little but get confused with LEFT JOIN. Haven't tried window functions yet. I solved 15 LeetCode SQL problems..."></textarea>
+    <button class="btn btn-primary" style="margin-top:12px;width:100%" onclick="getAssessment()">Get AI Assessment</button>
+  </div>
+  <div id="assessResult"></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const QUESTIONS = [
+  {
+    id: 1, level: 'easy',
+    title: 'Top Earners',
+    desc: 'Find top 3 highest paid employees from a table.',
+    context: 'Table: employees(id, name, department, salary)',
+    hint: 'Use ORDER BY and LIMIT'
+  },
+  {
+    id: 2, level: 'easy',
+    title: 'Department Count',
+    desc: 'Count employees in each department.',
+    context: 'Table: employees(id, name, department, salary)',
+    hint: 'Use GROUP BY with COUNT'
+  },
+  {
+    id: 3, level: 'medium',
+    title: 'Second Highest Salary',
+    desc: 'Find the second highest salary (no built-in rank function).',
+    context: 'Table: employees(id, name, salary)',
+    hint: 'Think: subquery or DISTINCT with ORDER BY'
+  },
+  {
+    id: 4, level: 'medium',
+    title: 'Customers with No Orders',
+    desc: 'Find customers who have never placed an order.',
+    context: 'Tables: customers(id, name), orders(id, customer_id, amount)',
+    hint: 'LEFT JOIN + WHERE IS NULL, or NOT IN subquery'
+  },
+  {
+    id: 5, level: 'hard',
+    title: 'Running Total',
+    desc: 'Calculate running total of sales ordered by date.',
+    context: 'Table: sales(id, date, amount)',
+    hint: 'SUM() OVER (ORDER BY date) — window function'
+  },
+  {
+    id: 6, level: 'hard',
+    title: 'Rank within Department',
+    desc: 'Rank employees by salary within each department.',
+    context: 'Table: employees(id, name, department, salary)',
+    hint: 'DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC)'
+  },
+];
+
+const INTERVIEW_QS = {
+  conceptual: [
+    {
+      q: "What is the difference between WHERE and HAVING?",
+      a: `<strong>WHERE</strong> filters rows BEFORE grouping. <strong>HAVING</strong> filters groups AFTER GROUP BY.<br><br>Think of it this way:<ul style="margin-top:8px;padding-left:18px"><li>WHERE works on individual row data</li><li>HAVING works on aggregated results (SUM, COUNT, etc.)</li></ul><code>SELECT department, COUNT(*) as cnt
+FROM employees
+WHERE salary > 30000         -- filters rows first
+GROUP BY department
+HAVING COUNT(*) > 5          -- filters groups after</code>`
+    },
+    {
+      q: "Difference between INNER JOIN, LEFT JOIN, and RIGHT JOIN?",
+      a: `<strong>INNER JOIN:</strong> Only rows that match in BOTH tables.<br>
+<strong>LEFT JOIN:</strong> All rows from left table + matching from right. Non-matches show NULL.<br>
+<strong>RIGHT JOIN:</strong> All rows from right table + matching from left.<br><br>
+<em>Analyst tip:</em> LEFT JOIN is most commonly used. Great for finding "customers with no orders", "products never sold", etc.<code>-- Left join example
+SELECT c.name, o.amount
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id</code>`
+    },
+    {
+      q: "What is a Window Function? How is it different from GROUP BY?",
+      a: `<strong>GROUP BY</strong> collapses rows into summary — you lose individual row detail.<br>
+<strong>Window Functions</strong> calculate across rows but KEEP each row in the result.<br><br>
+<em>Use case:</em> You want each employee's salary AND their department's average salary in the same row — GROUP BY can't do that alone, but OVER() can.<code>SELECT name, salary,
+  AVG(salary) OVER (PARTITION BY department) as dept_avg
+FROM employees</code>`
+    },
+    {
+      q: "What is the difference between UNION and UNION ALL?",
+      a: `<strong>UNION</strong> combines results of two queries and removes duplicates (slower).<br>
+<strong>UNION ALL</strong> combines results and keeps ALL rows including duplicates (faster).<br><br>
+<em>Rule of thumb:</em> Use UNION ALL unless you specifically need deduplication — it's more performant.<code>SELECT name FROM employees_2023
+UNION ALL
+SELECT name FROM employees_2024</code>`
+    },
+    {
+      q: "What is a CTE (Common Table Expression)?",
+      a: `A CTE is a temporary named result set defined with <strong>WITH</strong> keyword. It makes complex queries readable and reusable within the same query.<br><br>
+<em>Think of it as:</em> A temporary view that only lives for that one query.<code>WITH high_earners AS (
+  SELECT * FROM employees
+  WHERE salary > 80000
+)
+SELECT department, COUNT(*)
+FROM high_earners
+GROUP BY department</code>`
+    },
+  ],
+  query: [
+    {
+      q: "Write a query to find duplicate emails in a users table.",
+      a: `The trick is to GROUP BY and find groups with COUNT > 1.<code>SELECT email, COUNT(*) as occurrences
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1</code>`
+    },
+    {
+      q: "Find employees whose salary is above the average salary of their department.",
+      a: `Classic window function vs subquery problem. Clean approach using subquery:<code>SELECT e.name, e.salary, e.department
+FROM employees e
+WHERE e.salary > (
+  SELECT AVG(salary)
+  FROM employees
+  WHERE department = e.department
+)</code>Or with window function:<code>SELECT name, salary, department FROM (
+  SELECT name, salary, department,
+    AVG(salary) OVER (PARTITION BY department) as dept_avg
+  FROM employees
+) t
+WHERE salary > dept_avg</code>`
+    },
+    {
+      q: "Find the Nth highest salary without using TOP/LIMIT.",
+      a: `Classic interview question. Use DENSE_RANK():<code>-- Find 3rd highest salary
+SELECT salary FROM (
+  SELECT salary,
+    DENSE_RANK() OVER (ORDER BY salary DESC) as rnk
+  FROM employees
+) t
+WHERE rnk = 3</code>DENSE_RANK handles ties correctly — if two people share rank 2, rank 3 still exists.`
+    },
+    {
+      q: "Write a query to calculate month-over-month revenue growth.",
+      a: `Use LAG() window function to get previous month's value:<code>WITH monthly AS (
+  SELECT 
+    DATE_TRUNC('month', date) as month,
+    SUM(amount) as revenue
+  FROM sales
+  GROUP BY 1
+)
+SELECT 
+  month,
+  revenue,
+  LAG(revenue) OVER (ORDER BY month) as prev_revenue,
+  ROUND((revenue - LAG(revenue) OVER (ORDER BY month)) * 100.0
+    / LAG(revenue) OVER (ORDER BY month), 2) as pct_growth
+FROM monthly</code>`
+    },
+  ],
+  scenario: [
+    {
+      q: "A dashboard is loading slowly. The main query takes 45 seconds. How would you approach optimizing it?",
+      a: `This tests your analytical thinking, not just syntax.<br><br>
+<strong>Step 1:</strong> Look at what the query is doing — unnecessary columns in SELECT *, missing filters, cartesian joins?<br>
+<strong>Step 2:</strong> Check if columns used in WHERE/JOIN have indexes.<br>
+<strong>Step 3:</strong> Are there repeated subqueries that could be CTEs?<br>
+<strong>Step 4:</strong> Can you reduce the dataset early with WHERE filters before joining?<br>
+<strong>Step 5:</strong> Consider if aggregation can happen before joining.<br><br>
+<em>Key answer:</em> "I would use EXPLAIN/EXPLAIN ANALYZE to see the query execution plan and find bottlenecks."`
+    },
+    {
+      q: "How would you find users who logged in 3 consecutive days?",
+      a: `Classic consecutive days problem — requires LAG() or self-join thinking.<code>WITH login_gaps AS (
+  SELECT 
+    user_id, login_date,
+    LAG(login_date) OVER (PARTITION BY user_id ORDER BY login_date) as prev_day,
+    LAG(login_date, 2) OVER (PARTITION BY user_id ORDER BY login_date) as prev2_day
+  FROM logins
+)
+SELECT DISTINCT user_id
+FROM login_gaps
+WHERE login_date = prev_day + 1
+  AND login_date = prev2_day + 2</code>
+<em>Shows you understand LAG, PARTITION BY, and date arithmetic.</em>`
+    },
+    {
+      q: "You have a 'sessions' table with user_id, start_time, end_time. How do you find average session duration per user?",
+      a: `Straightforward but tests if you know date functions:<code>SELECT 
+  user_id,
+  COUNT(*) as total_sessions,
+  AVG(DATEDIFF(minute, start_time, end_time)) as avg_duration_mins
+FROM sessions
+GROUP BY user_id</code>
+Bonus point: mention handling NULL end_times for active sessions — shows real-world awareness.`
+    },
+  ]
+};
+
+// RENDER QUESTIONS
+function renderQuestions() {
+  const grid = document.getElementById('questionGrid');
+  QUESTIONS.forEach(q => {
+    const div = document.createElement('div');
+    div.className = 'q-card';
+    div.id = 'qcard-' + q.id;
+    div.innerHTML = `
+      <div class="q-level ${q.level}">${q.level.toUpperCase()}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="q-desc">${q.desc}<br><small style="color:#4a4a6a;font-size:11px;margin-top:4px;display:block">${q.context}</small></div>
+    `;
+    div.onclick = () => selectQuestion(q);
+    grid.appendChild(div);
+  });
+}
+
+let activeQ = null;
+function selectQuestion(q) {
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('qcard-' + q.id).classList.add('selected');
+  activeQ = q;
+  document.getElementById('editorArea').style.display = 'block';
+  document.getElementById('activeQTitle').textContent = q.title.toUpperCase();
+  document.getElementById('sqlEditor').value = '';
+  const rb = document.getElementById('resultBox');
+  rb.className = 'result-box';
+  rb.innerHTML = '';
+  document.getElementById('sqlEditor').placeholder = `-- ${q.desc}\n-- Table: ${q.context}\n-- Hint: ${q.hint}\n\nSELECT `;
+  document.getElementById('sqlEditor').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetEditor() {
+  document.getElementById('sqlEditor').value = '';
+  const rb = document.getElementById('resultBox');
+  rb.className = 'result-box'; rb.innerHTML = '';
+}
+
+async function submitQuery() {
+  if (!activeQ) return;
+  const sql = document.getElementById('sqlEditor').value.trim();
+  if (!sql || sql.length < 5) {
+    showResult('neutral', '⚠️ Please write a SQL query first.');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  showResult('loading', '<div class="spinner"></div> Analyzing your query...');
+
+  const prompt = `You are a SQL mentor assessing a Data Analyst candidate's query.
+
+Question: "${activeQ.title}" — ${activeQ.desc}
+Schema: ${activeQ.context}
+Hint given: ${activeQ.hint}
+
+Candidate's SQL:
+\`\`\`sql
+${sql}
+\`\`\`
+
+Evaluate this SQL query in English. Give feedback in this format:
+1. ✅ / ❌ Correctness: Is the logic right? What would this actually return?
+2. 💡 Approach: What technique did they use? Is it the best approach?
+3. 🚀 Improvement: One concrete thing to make it better/cleaner (if any)
+4. 📊 Score: X/10
+
+Be encouraging but honest. Keep response under 200 words. Use plain text, no markdown symbols except the emojis listed.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(i => i.text || '').join('') || 'Could not assess.';
+    const isGood = text.includes('✅') || text.toLowerCase().includes('correct') || text.includes('8/10') || text.includes('9/10') || text.includes('10/10');
+    showResult(isGood ? 'good' : 'neutral', text.replace(/\n/g, '<br>'));
+  } catch(e) {
+    showResult('bad', '❌ Could not connect to AI. Please try again.');
+  }
+  btn.disabled = false;
+}
+
+function showResult(type, html) {
+  const rb = document.getElementById('resultBox');
+  rb.className = `result-box show ${type}`;
+  rb.innerHTML = html;
+}
+
+// RENDER INTERVIEW
+function renderInterview() {
+  ['conceptual', 'query', 'scenario'].forEach(cat => {
+    const container = document.getElementById(cat + 'Q');
+    INTERVIEW_QS[cat].forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'iq-item';
+      div.innerHTML = `
+        <div class="iq-question">
+          <span>${item.q}</span>
+          <span class="iq-arrow">›</span>
+        </div>
+        <div class="iq-answer">${item.a}</div>
+      `;
+      div.onclick = () => div.classList.toggle('open');
+      container.appendChild(div);
+    });
+  });
+}
+
+// ASSESSMENT
+async function getAssessment() {
+  const input = document.getElementById('selfAssess').value.trim();
+  if (!input || input.length < 20) {
+    document.getElementById('assessResult').innerHTML = '<div class="result-box show bad">Please describe your SQL experience in a few sentences.</div>';
+    return;
+  }
+
+  document.getElementById('assessResult').innerHTML = '<div class="result-box show loading"><div class="spinner"></div> Assessing your level...</div>';
+
+  const prompt = `You are a senior data analyst interviewer assessing a candidate's SQL level.
+
+Candidate's self-description: "${input}"
+
+Respond in English with:
+1. CURRENT LEVEL: (Beginner / Intermediate / Advanced) — 1-2 sentences why
+2. STRENGTHS: What they clearly know
+3. GAPS: Top 2-3 things they need to focus on next
+4. THIS WEEK: One specific, actionable practice task for this week
+5. INTERVIEW READINESS: Ready for entry-level / mid-level / senior interviews? Brief explanation.
+
+Be direct, specific, and encouraging. Under 250 words. No markdown formatting, use the numbered labels as shown.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(i => i.text || '').join('') || 'Could not assess.';
+    document.getElementById('assessResult').innerHTML = `<div class="result-box show neutral" style="white-space:pre-line">${text}</div>`;
+  } catch(e) {
+    document.getElementById('assessResult').innerHTML = '<div class="result-box show bad">Could not connect. Please try again.</div>';
+  }
+}
+
+// TABS
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// INIT
+renderQuestions();
+renderInterview();
+</script>
+</body>
+</html>
