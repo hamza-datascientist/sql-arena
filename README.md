@@ -44,20 +44,6 @@ sql-arena/
 ```
 
 ---
-
-## ⚙️ How to Run Locally
-
-No installation needed. Just open the file:
-
-```bash
-# Option 1: Direct open
-Double-click sql-practice.html in your file explorer
-
-# Option 2: VS Code Live Server
-Right-click → Open with Live Server
-```
----
-
 ## 👤 Author
 
 **Hamza Siddiqui**  
