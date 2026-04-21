@@ -56,36 +56,6 @@ Double-click sql-practice.html in your file explorer
 # Option 2: VS Code Live Server
 Right-click → Open with Live Server
 ```
-
----
-
-## 🌐 Deploy on GitHub Pages
-
-1. Create a new GitHub repository (e.g., `sql-arena`)
-2. Upload `sql-practice.html` and `README.md`
-3. Go to **Settings → Pages**
-4. Set Branch to `main` → Click **Save**
-5. Your site will be live at `https://your-username.github.io/sql-arena`
-
----
-
-## 💡 What I Learned / Built
-
-- Integrated **Anthropic Claude API** for real-time SQL query evaluation
-- Built a fully responsive **single-page application** without any framework
-- Designed a **dark-themed UI** with CSS animations and custom design system
-- Created structured **interview preparation content** for Data Analyst roles
-
----
-
-## 🔮 Future Improvements
-
-- [ ] Add more SQL questions (20+)
-- [ ] User progress tracking with localStorage
-- [ ] Leaderboard for practice scores
-- [ ] Schema visualizer for each question
-- [ ] Add PostgreSQL / MySQL syntax toggle
-
 ---
 
 ## 👤 Author
@@ -95,8 +65,4 @@ Right-click → Open with Live Server
     https://www.linkedin.com/in/hamza-siddiqui-990b48330
 )
 
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+---`
